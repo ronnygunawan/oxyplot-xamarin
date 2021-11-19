@@ -2,109 +2,93 @@
 using OxyPlot.Xamarin.Forms;
 using OxyPlot.Xamarin.Forms.Platform.Android;
 
-using global::Xamarin.Forms;
-using global::Xamarin.Forms.Platform.Android;
+using Xamarin.Forms;
+using Xamarin.Forms.Platform.Android;
 
 // Exports the renderer.
 [assembly: ExportRenderer(typeof(PlotView), typeof(PlotViewRenderer))]
 
-namespace OxyPlot.Xamarin.Forms.Platform.Android
-{
-    using System.ComponentModel;
+namespace OxyPlot.Xamarin.Forms.Platform.Android {
+	using System.ComponentModel;
+	using System.Diagnostics.CodeAnalysis;
+	using OxyPlot.Xamarin.Android;
 
-    using OxyPlot.Xamarin.Android;
+	/// <summary>
+	/// Provides a custom <see cref="Xamarin.Forms.PlotView" /> renderer for Xamarin.Android.
+	/// </summary>
+	public class PlotViewRenderer : ViewRenderer<Xamarin.Forms.PlotView, PlotView> {
+		/// <summary>
+		/// Initializes static members of the <see cref="PlotViewRenderer"/> class.
+		/// </summary>
+		static PlotViewRenderer() {
+			Init();
+		}
 
-    /// <summary>
-    /// Provides a custom <see cref="OxyPlot.Xamarin.Forms.PlotView" /> renderer for Xamarin.Android. 
-    /// </summary>
-    public class PlotViewRenderer : ViewRenderer<Xamarin.Forms.PlotView, PlotView>
-    {
-        /// <summary>
-        /// Initializes static members of the <see cref="PlotViewRenderer"/> class.
-        /// </summary>
-        static PlotViewRenderer()
-        {
-            Init();
-        }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PlotViewRenderer"/> class.
+		/// </summary>
+		public PlotViewRenderer(Context context) : base(context) {
+		}
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PlotViewRenderer"/> class.
-        /// </summary>
-        public PlotViewRenderer(Context context) : base(context)
-        {
-        }
+		/// <summary>
+		/// Initializes the renderer.
+		/// </summary>
+		/// <remarks>This method must be called before a <see cref="T:PlotView" /> is used.</remarks>
+		public static void Init() {
+			OxyPlot.Xamarin.Forms.PlotView.IsRendererInitialized = true;
+		}
 
-        /// <summary>
-        /// Initializes the renderer.
-        /// </summary>
-        /// <remarks>This method must be called before a <see cref="T:PlotView" /> is used.</remarks>
-        public static void Init()
-        {
-            OxyPlot.Xamarin.Forms.PlotView.IsRendererInitialized = true;
-        }
+		/// <summary>
+		/// Raises the element changed event.
+		/// </summary>
+		/// <param name="e">The event arguments.</param>
+		[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Assigned to a view holder")]
+		protected override void OnElementChanged(ElementChangedEventArgs<Xamarin.Forms.PlotView> e) {
+			base.OnElementChanged(e);
+			if (e.OldElement != null || Element == null) {
+				return;
+			}
 
-        /// <summary>
-        /// Raises the element changed event.
-        /// </summary>
-        /// <param name="e">The event arguments.</param>
-        protected override void OnElementChanged(ElementChangedEventArgs<Xamarin.Forms.PlotView> e)
-        {
-            base.OnElementChanged(e);
-            if (e.OldElement != null || this.Element == null)
-            {
-                return;
-            }
+			DetachModelFromView();
 
-            this.DetachModelFromView();
+			PlotView plotView = new(Context) {
+				Model = Element.Model,
+				Controller = Element.Controller
+			};
 
-            var plotView = new PlotView(this.Context)
-            {
-                Model = this.Element.Model,
-                Controller = this.Element.Controller
-            };
+			plotView.SetBackgroundColor(Element.BackgroundColor.ToAndroid());
 
-            plotView.SetBackgroundColor(this.Element.BackgroundColor.ToAndroid());
+			SetNativeControl(plotView);
+		}
 
-            this.SetNativeControl(plotView);
-        }
+		/// <summary>
+		/// Raises the element property changed event.
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="e">The event arguments.</param>
+		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e) {
+			base.OnElementPropertyChanged(sender, e);
+			if (Element == null || Control == null) {
+				return;
+			}
 
-        /// <summary>
-        /// Raises the element property changed event.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The event arguments.</param>
-        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            base.OnElementPropertyChanged(sender, e);
-            if (this.Element == null || this.Control == null)
-            {
-                return;
-            }
+			if (e.PropertyName == Xamarin.Forms.PlotView.ModelProperty.PropertyName) {
+				DetachModelFromView();
+				Control.Model = Element.Model;
+			}
 
-            if (e.PropertyName == Xamarin.Forms.PlotView.ModelProperty.PropertyName)
-            {
-                this.DetachModelFromView();
-                this.Control.Model = this.Element.Model;
-            }
+			if (e.PropertyName == Xamarin.Forms.PlotView.ControllerProperty.PropertyName) {
+				Control.Controller = Element.Controller;
+			}
 
-            if (e.PropertyName == Xamarin.Forms.PlotView.ControllerProperty.PropertyName)
-            {
-                this.Control.Controller = this.Element.Controller;
-            }
+			if (e.PropertyName == VisualElement.BackgroundColorProperty.PropertyName) {
+				Control.SetBackgroundColor(Element.BackgroundColor.ToAndroid());
+			}
+		}
 
-            if (e.PropertyName == VisualElement.BackgroundColorProperty.PropertyName)
-            {
-                this.Control.SetBackgroundColor(this.Element.BackgroundColor.ToAndroid());
-            }
-        }
- 
-        void DetachModelFromView()
-        {
-            var model = base.Element.Model as OxyPlot.IPlotModel;
-            if (model != null)
-            {
-                model.AttachPlotView(null);
-            }
-        }
-    }
+		void DetachModelFromView() {
+			IPlotModel model = Element.Model;
+			model?.AttachPlotView(null);
+		}
+	}
 }

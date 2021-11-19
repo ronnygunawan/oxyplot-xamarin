@@ -1,4 +1,4 @@
-// --------------------------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Forms.cs" company="OxyPlot">
 //   Copyright (c) 2014 OxyPlot contributors
 // </copyright>
@@ -7,10 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+
 namespace OxyPlot.Xamarin.Forms.Platform.Android
 {
-    using System;
-
     /// <summary>
     /// Initializes OxyPlot renderers for use with Xamarin.Forms.
     /// </summary>

@@ -7,18 +7,15 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace OxyPlot.Xamarin.Forms
-{
-    using System;
+using System;
 
-    using OxyPlot;
+using Xamarin.Forms;
 
-    using global::Xamarin.Forms;
-
-    /// <summary>
-    /// Represents a visual element that displays a <see cref="PlotModel" />.
-    /// </summary>
-    public class PlotView : View
+namespace OxyPlot.Xamarin.Forms {
+	/// <summary>
+	/// Represents a visual element that displays a <see cref="PlotModel" />.
+	/// </summary>
+	public class PlotView : View
     {
         /// <summary>
         /// Identifies the <see cref="Controller" />  bindable property.
@@ -38,7 +35,7 @@ namespace OxyPlot.Xamarin.Forms
         {
             if (!IsRendererInitialized && !DesignMode.IsDesignModeEnabled)
             {
-                var platform = Device.RuntimePlatform == Device.macOS ? "MacOS" : Device.RuntimePlatform.ToString();
+				string? platform = Device.RuntimePlatform == Device.macOS ? "MacOS" : Device.RuntimePlatform;
                 throw new InvalidOperationException(
                     "Renderer is not initialized.\nRemember to call `OxyPlot.Xamarin.Forms.Platform." + platform +
                     ".PlotViewRenderer.Init();` after `Xamarin.Forms.Forms.Init(e);` in the " + platform +
@@ -52,8 +49,8 @@ namespace OxyPlot.Xamarin.Forms
         /// <value>The model.</value>
         public PlotModel Model
         {
-            get { return (PlotModel)this.GetValue(ModelProperty); }
-            set { this.SetValue(ModelProperty, value); }
+            get { return (PlotModel)GetValue(ModelProperty); }
+            set { SetValue(ModelProperty, value); }
         }
 
         /// <summary>
@@ -62,8 +59,8 @@ namespace OxyPlot.Xamarin.Forms
         /// <value>The controller.</value>
         public PlotController Controller
         {
-            get { return (PlotController)this.GetValue(ControllerProperty); }
-            set { this.SetValue(ControllerProperty, value); }
+            get { return (PlotController)GetValue(ControllerProperty); }
+            set { SetValue(ControllerProperty, value); }
         }
 
         /// <summary>

@@ -7,13 +7,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+
+using Android.Graphics;
+using Android.Views;
+
 namespace OxyPlot.Xamarin.Android
 {
-    using System;
-
-    using global::Android.Graphics;
-    using global::Android.Views;
-
     /// <summary>
     /// Provides extension methods that converts between Android types and OxyPlot types.
     /// </summary>
@@ -73,7 +73,7 @@ namespace OxyPlot.Xamarin.Android
         /// <returns>The touch points.</returns>
         public static ScreenPoint[] GetTouchPoints(this MotionEvent e, double scale)
         {
-            var result = new ScreenPoint[e.PointerCount];
+			ScreenPoint[] result = new ScreenPoint[e.PointerCount];
             for (int i = 0; i < e.PointerCount; i++)
             {
                 result[i] = new ScreenPoint(e.GetX(i) / scale, e.GetY(i) / scale);
@@ -206,7 +206,7 @@ namespace OxyPlot.Xamarin.Android
         /// <returns>The converted modifier keys.</returns>
         public static OxyModifierKeys GetModifierKeys(this KeyEvent e)
         {
-            var result = OxyModifierKeys.None;
+			OxyModifierKeys result = OxyModifierKeys.None;
 
             if (e.IsAltPressed)
             {
