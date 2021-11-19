@@ -43,6 +43,10 @@ namespace OxyPlot.Xamarin.iOS
         /// </summary>
         private readonly CGContext gctx;
 
+        private int clipCount = 0;
+
+        public override int ClipCount => clipCount;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreGraphicsRenderContext"/> class.
         /// </summary>
@@ -68,7 +72,7 @@ namespace OxyPlot.Xamarin.iOS
         /// <param name="fill">The fill color.</param>
         /// <param name="stroke">The stroke color.</param>
         /// <param name="thickness">The thickness.</param>
-        public override void DrawEllipse(OxyRect rect, OxyColor fill, OxyColor stroke, double thickness)
+        public override void DrawEllipse(OxyRect rect, OxyColor fill, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode)
         {
             this.SetAlias(false);
             var convertedRectangle = rect.Convert();
@@ -155,19 +159,20 @@ namespace OxyPlot.Xamarin.iOS
         /// </summary>
         /// <param name="rect">The clip rectangle.</param>
         /// <returns>True if the clip rectangle was set.</returns>
-        public override bool SetClip(OxyRect rect)
+        public override void PushClip(OxyRect rect)
         {
             this.gctx.SaveState();
             this.gctx.ClipToRect(rect.Convert());
-            return true;
+            clipCount++;
         }
 
         /// <summary>
         /// Resets the clip rectangle.
         /// </summary>
-        public override void ResetClip()
+        public override void PopClip()
         {
             this.gctx.RestoreState();
+            clipCount--;
         }
 
         /// <summary>
@@ -178,17 +183,16 @@ namespace OxyPlot.Xamarin.iOS
         /// <param name="thickness">The stroke thickness.</param>
         /// <param name="dashArray">The dash array.</param>
         /// <param name="lineJoin">The line join type.</param>
-        /// <param name="aliased">if set to <c>true</c> the shape will be aliased.</param>
-        public override void DrawLine(IList<ScreenPoint> points, OxyColor stroke, double thickness, double[] dashArray, LineJoin lineJoin, bool aliased)
+        public override void DrawLine(IList<ScreenPoint> points, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode, double[] dashArray, LineJoin lineJoin)
         {
             if (stroke.IsVisible() && thickness > 0)
             {
-                this.SetAlias(aliased);
+                this.SetAlias(edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
                 this.SetStroke(stroke, thickness, dashArray, lineJoin);
 
                 using (var path = new CGPath())
                 {
-                    var convertedPoints = (aliased ? points.Select(p => p.ConvertAliased()) : points.Select(p => p.Convert())).ToArray();
+                    var convertedPoints = (edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy ? points.Select(p => p.ConvertAliased()) : points.Select(p => p.Convert())).ToArray();
                     path.AddLines(convertedPoints);
                     this.gctx.AddPath(path);
                 }
@@ -206,11 +210,10 @@ namespace OxyPlot.Xamarin.iOS
         /// <param name="thickness">The stroke thickness.</param>
         /// <param name="dashArray">The dash array.</param>
         /// <param name="lineJoin">The line join type.</param>
-        /// <param name="aliased">If set to <c>true</c> the shape will be aliased.</param>
-        public override void DrawPolygon(IList<ScreenPoint> points, OxyColor fill, OxyColor stroke, double thickness, double[] dashArray, LineJoin lineJoin, bool aliased)
+        public override void DrawPolygon(IList<ScreenPoint> points, OxyColor fill, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode, double[] dashArray, LineJoin lineJoin)
         {
-            this.SetAlias(aliased);
-            var convertedPoints = (aliased ? points.Select(p => p.ConvertAliased()) : points.Select(p => p.Convert())).ToArray();
+            this.SetAlias(edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
+            var convertedPoints = (edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy ? points.Select(p => p.ConvertAliased()) : points.Select(p => p.Convert())).ToArray();
             if (fill.IsVisible())
             {
                 this.SetFill(fill);
@@ -246,7 +249,7 @@ namespace OxyPlot.Xamarin.iOS
         /// <param name="fill">The fill color.</param>
         /// <param name="stroke">The stroke color.</param>
         /// <param name="thickness">The stroke thickness.</param>
-        public override void DrawRectangle(OxyRect rect, OxyColor fill, OxyColor stroke, double thickness)
+        public override void DrawRectangle(OxyRect rect, OxyColor fill, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode)
         {
             this.SetAlias(true);
             var convertedRect = rect.ConvertAliased();
