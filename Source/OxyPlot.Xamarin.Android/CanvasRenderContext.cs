@@ -51,7 +51,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <summary>
 		/// The canvas to draw on.
 		/// </summary>
-		private Canvas _canvas;
+		private Canvas? _canvas;
 
 		private bool _disposedValue;
 
@@ -80,7 +80,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// </summary>
 		public double FontScale { get; }
 
-		public override int ClipCount => _canvas.SaveCount;
+		public override int ClipCount => _canvas?.SaveCount ?? 0;
 
 		/// <summary>
 		/// Sets the target.
@@ -97,19 +97,20 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="fill">The fill color.</param>
 		/// <param name="stroke">The stroke color.</param>
 		/// <param name="thickness">The thickness.</param>
+		/// <param name="edgeRenderingMode"></param>
 		public override void DrawEllipse(OxyRect rect, OxyColor fill, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode) {
 			_paint.Reset();
 			{
 				if (fill.IsVisible()) {
 					SetFill(fill);
 					using RectF rectF = Convert(rect);
-					_canvas.DrawOval(rectF, _paint);
+					_canvas?.DrawOval(rectF, _paint);
 				}
 
 				if (stroke.IsVisible()) {
 					SetStroke(stroke, thickness);
 					using RectF rectF = Convert(rect);
-					_canvas.DrawOval(rectF, _paint);
+					_canvas?.DrawOval(rectF, _paint);
 				}
 			}
 		}
@@ -122,6 +123,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="fill">The fill color.</param>
 		/// <param name="stroke">The stroke color.</param>
 		/// <param name="thickness">The stroke thickness.</param>
+		/// <param name="edgeRenderingMode"></param>
 		public override void DrawEllipses(IList<OxyRect> rectangles, OxyColor fill, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode) {
 			_paint.Reset();
 			{
@@ -129,13 +131,13 @@ namespace OxyPlot.Xamarin.Android {
 					if (fill.IsVisible()) {
 						SetFill(fill);
 						using RectF rectF = Convert(rect);
-						_canvas.DrawOval(rectF, _paint);
+						_canvas?.DrawOval(rectF, _paint);
 					}
 
 					if (stroke.IsVisible()) {
 						SetStroke(stroke, thickness);
 						using RectF rectF = Convert(rect);
-						_canvas.DrawOval(rectF, _paint);
+						_canvas?.DrawOval(rectF, _paint);
 					}
 				}
 			}
@@ -147,6 +149,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="points">The points.</param>
 		/// <param name="stroke">The stroke color.</param>
 		/// <param name="thickness">The stroke thickness.</param>
+		/// <param name="edgeRenderingMode"></param>
 		/// <param name="dashArray">The dash array.</param>
 		/// <param name="lineJoin">The line join type.</param>
 		public override void DrawLine(IList<ScreenPoint> points, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode, double[] dashArray, LineJoin lineJoin) {
@@ -156,7 +159,7 @@ namespace OxyPlot.Xamarin.Android {
 				{
 					SetPath(points, edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
 					SetStroke(stroke, thickness, dashArray, lineJoin, edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
-					_canvas.DrawPath(_path, _paint);
+					_canvas?.DrawPath(_path, _paint);
 				}
 			}
 		}
@@ -168,6 +171,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="points">The points.</param>
 		/// <param name="stroke">The stroke color.</param>
 		/// <param name="thickness">The stroke thickness.</param>
+		/// <param name="edgeRenderingMode"></param>
 		/// <param name="dashArray">The dash array.</param>
 		/// <param name="lineJoin">The line join type.</param>
 		public override void DrawLineSegments(IList<ScreenPoint> points, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode, double[] dashArray, LineJoin lineJoin) {
@@ -187,7 +191,7 @@ namespace OxyPlot.Xamarin.Android {
 					}
 				}
 
-				_canvas.DrawLines(_pts.ToArray(), _paint);
+				_canvas?.DrawLines(_pts.ToArray(), _paint);
 			}
 		}
 
@@ -198,6 +202,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="fill">The fill color.</param>
 		/// <param name="stroke">The stroke color.</param>
 		/// <param name="thickness">The stroke thickness.</param>
+		/// <param name="edgeRenderingMode"></param>
 		/// <param name="dashArray">The dash array.</param>
 		/// <param name="lineJoin">The line join type.</param>
 		public override void DrawPolygon(IList<ScreenPoint> points, OxyColor fill, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode, double[] dashArray, LineJoin lineJoin) {
@@ -210,12 +215,12 @@ namespace OxyPlot.Xamarin.Android {
 
 					if (fill.IsVisible()) {
 						SetFill(fill);
-						_canvas.DrawPath(_path, _paint);
+						_canvas?.DrawPath(_path, _paint);
 					}
 
 					if (stroke.IsVisible()) {
 						SetStroke(stroke, thickness, dashArray, lineJoin, edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
-						_canvas.DrawPath(_path, _paint);
+						_canvas?.DrawPath(_path, _paint);
 					}
 				}
 			}
@@ -228,17 +233,18 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="fill">The fill color.</param>
 		/// <param name="stroke">The stroke color.</param>
 		/// <param name="thickness">The stroke thickness.</param>
+		/// <param name="edgeRenderingMode"></param>
 		public override void DrawRectangle(OxyRect rect, OxyColor fill, OxyColor stroke, double thickness, EdgeRenderingMode edgeRenderingMode) {
 			_paint.Reset();
 			{
 				if (fill.IsVisible()) {
 					SetFill(fill);
-					_canvas.DrawRect(ConvertAliased(rect.Left), ConvertAliased(rect.Top), ConvertAliased(rect.Right), ConvertAliased(rect.Bottom), _paint);
+					_canvas?.DrawRect(ConvertAliased(rect.Left), ConvertAliased(rect.Top), ConvertAliased(rect.Right), ConvertAliased(rect.Bottom), _paint);
 				}
 
 				if (stroke.IsVisible()) {
 					SetStroke(stroke, thickness, aliased: true);
-					_canvas.DrawRect(ConvertAliased(rect.Left), ConvertAliased(rect.Top), ConvertAliased(rect.Right), ConvertAliased(rect.Bottom), _paint);
+					_canvas?.DrawRect(ConvertAliased(rect.Left), ConvertAliased(rect.Top), ConvertAliased(rect.Right), ConvertAliased(rect.Bottom), _paint);
 				}
 			}
 		}
@@ -292,20 +298,20 @@ namespace OxyPlot.Xamarin.Android {
 				int x0 = -_bounds.Left;
 				float y0 = delta;
 
-				_canvas.Save();
-				_canvas.Translate(Convert(p.X), Convert(p.Y));
-				_canvas.Rotate((float)rotate);
-				_canvas.Translate((float)dx + x0, (float)dy + y0);
+				_canvas?.Save();
+				_canvas?.Translate(Convert(p.X), Convert(p.Y));
+				_canvas?.Rotate((float)rotate);
+				_canvas?.Translate((float)dx + x0, (float)dy + y0);
 
 				if (maxSize.HasValue) {
 					int x1 = -x0;
 					float y1 = -height - y0;
-					_canvas.ClipRect(x1, y1, x1 + width, y1 + height);
-					_canvas.Translate(0, lineHeight - height);
+					_canvas?.ClipRect(x1, y1, x1 + width, y1 + height);
+					_canvas?.Translate(0, lineHeight - height);
 				}
 
-				_canvas.DrawText(text, 0, 0, _paint);
-				_canvas.Restore();
+				_canvas?.DrawText(text, 0, 0, _paint);
+				_canvas?.Restore();
 			}
 		}
 
@@ -326,8 +332,8 @@ namespace OxyPlot.Xamarin.Android {
 			{
 				_paint.AntiAlias = true;
 				_paint.TextSize = Convert(fontSize);
-				float lineHeight, delta;
-				GetFontMetrics(_paint, out lineHeight, out delta);
+				float lineHeight;
+				GetFontMetrics(_paint, out lineHeight, out float _);
 				_paint.GetTextBounds(text, 0, text.Length, _bounds);
 				return new OxySize(_bounds.Width() / FontScale, lineHeight / FontScale);
 			}
@@ -339,16 +345,16 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="rect">The clip rectangle.</param>
 		/// <returns>True if the clip rectangle was set.</returns>
 		public override void PushClip(OxyRect rect) {
-			_canvas.Save();
+			_canvas?.Save();
 			using RectF rectF = Convert(rect);
-			_canvas.ClipRect(rectF);
+			_canvas?.ClipRect(rectF);
 		}
 
 		/// <summary>
 		/// Resets the clip rectangle.
 		/// </summary>
 		public override void PopClip() {
-			_canvas.Restore();
+			_canvas?.Restore();
 		}
 
 		/// <summary>
@@ -377,7 +383,7 @@ namespace OxyPlot.Xamarin.Android {
 			double destHeight,
 			double opacity,
 			bool interpolate) {
-			Bitmap image = GetImage(source);
+			Bitmap? image = GetImage(source);
 			if (image == null) {
 				return;
 			}
@@ -388,7 +394,7 @@ namespace OxyPlot.Xamarin.Android {
 			_paint.Reset();
 
 			// TODO: support opacity
-			_canvas.DrawBitmap(image, src, dest, _paint);
+			_canvas?.DrawBitmap(image, src, dest, _paint);
 		}
 
 		/// <summary>
@@ -398,8 +404,8 @@ namespace OxyPlot.Xamarin.Android {
 		public override void CleanUp() {
 			List<OxyImage> imagesToRelease = _imageCache.Keys.Where(i => !_imagesInUse.Contains(i)).ToList();
 			foreach (OxyImage i in imagesToRelease) {
-				Bitmap image = GetImage(i);
-				image.Dispose();
+				Bitmap? image = GetImage(i);
+				image?.Dispose();
 				_imageCache.Remove(i);
 			}
 
@@ -413,7 +419,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="defaultLineHeight">Default line height.</param>
 		/// <param name="delta">The vertical delta.</param>
 		private void GetFontMetrics(Paint paint, out float defaultLineHeight, out float delta) {
-			Paint.FontMetrics metrics = paint.GetFontMetrics();
+			Paint.FontMetrics metrics = paint.GetFontMetrics()!;
 			float ascent = -metrics.Ascent;
 			float descent = metrics.Descent;
 			float leading = metrics.Leading;
@@ -483,7 +489,6 @@ namespace OxyPlot.Xamarin.Android {
 			_paint.AntiAlias = true;
 		}
 
-
 		/// <summary>
 		/// Sets the stroke style.
 		/// </summary>
@@ -493,7 +498,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="lineJoin">The line join.</param>
 		/// <param name="aliased">Use aliased strokes if set to <c>true</c>.</param>
 		[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not the right place to dispose")]
-		private void SetStroke(OxyColor stroke, double thickness, double[] dashArray = null, LineJoin lineJoin = LineJoin.Miter, bool aliased = false) {
+		private void SetStroke(OxyColor stroke, double thickness, double[]? dashArray = null, LineJoin lineJoin = LineJoin.Miter, bool aliased = false) {
 			_paint.SetStyle(Paint.Style.Stroke);
 			_paint.Color = stroke.ToColor();
 			_paint.StrokeWidth = Convert(thickness);
@@ -512,7 +517,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// </summary>
 		/// <param name="source">The source image.</param>
 		/// <returns>A <see cref="Bitmap" />.</returns>
-		private Bitmap GetImage(OxyImage source) {
+		private Bitmap? GetImage(OxyImage? source) {
 			if (source == null) {
 				return null;
 			}
@@ -521,11 +526,13 @@ namespace OxyPlot.Xamarin.Android {
 				_imagesInUse.Add(source);
 			}
 
-			Bitmap bitmap;
+			Bitmap? bitmap;
 			if (!_imageCache.TryGetValue(source, out bitmap)) {
 				byte[] bytes = source.GetData();
 				bitmap = BitmapFactory.DecodeByteArray(bytes, 0, bytes.Length);
-				_imageCache.Add(source, bitmap);
+				if (bitmap != null) {
+					_imageCache.Add(source, bitmap);
+				}
 			}
 
 			return bitmap;
@@ -541,7 +548,7 @@ namespace OxyPlot.Xamarin.Android {
 					_paint.Dispose();
 					_path.Dispose();
 					_bounds.Dispose();
-					_canvas.Dispose();
+					_canvas?.Dispose();
 				}
 
 				_disposedValue = true;

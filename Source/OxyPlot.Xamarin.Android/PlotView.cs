@@ -37,22 +37,22 @@ namespace OxyPlot.Xamarin.Android {
 		/// <summary>
 		/// The touch points of the previous touch event.
 		/// </summary>
-		private ScreenPoint[] _previousTouchPoints;
+		private ScreenPoint[]? _previousTouchPoints;
 
 		/// <summary>
 		/// The current model.
 		/// </summary>
-		private PlotModel _model;
+		private PlotModel? _model;
 
 		/// <summary>
 		/// The default controller
 		/// </summary>
-		private IPlotController _defaultController;
+		private IPlotController? _defaultController;
 
 		/// <summary>
 		/// The current render context.
 		/// </summary>
-		private CanvasRenderContext _rc;
+		private CanvasRenderContext? _rc;
 
 		/// <summary>
 		/// The model invalidated flag.
@@ -98,7 +98,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// Gets or sets the plot model.
 		/// </summary>
 		/// <value>The model.</value>
-		public PlotModel Model {
+		public PlotModel? Model {
 			get {
 				return _model;
 			}
@@ -124,7 +124,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// Gets or sets the plot controller.
 		/// </summary>
 		/// <value>The controller.</value>
-		public IPlotController Controller { get; set; }
+		public IPlotController? Controller { get; set; }
 
 		/// <summary>
 		/// Gets the actual model in the view.
@@ -132,7 +132,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <value>
 		/// The actual model.
 		/// </value>
-		Model IView.ActualModel {
+		Model? IView.ActualModel {
 			get {
 				return Model;
 			}
@@ -141,7 +141,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <summary>
 		/// Gets the actual <see cref="PlotModel" /> of the control.
 		/// </summary>
-		public PlotModel ActualModel {
+		public PlotModel? ActualModel {
 			get {
 				return Model;
 			}
@@ -237,10 +237,10 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="keyCode">The key code.</param>
 		/// <param name="e">The event arguments.</param>
 		/// <returns><c>true</c> if the event was handled.</returns>
-		public override bool OnKeyDown(Keycode keyCode, KeyEvent e) {
+		public override bool OnKeyDown(Keycode keyCode, KeyEvent? e) {
 			bool handled = base.OnKeyDown(keyCode, e);
 			if (!handled) {
-				handled = ActualController.HandleKeyDown(this, e.ToKeyEventArgs());
+				handled = ActualController.HandleKeyDown(this, e?.ToKeyEventArgs());
 			}
 
 			return handled;
@@ -251,10 +251,10 @@ namespace OxyPlot.Xamarin.Android {
 		/// </summary>
 		/// <param name="e">The motion event arguments.</param>
 		/// <returns><c>true</c> if the event was handled.</returns>
-		public override bool OnTouchEvent(MotionEvent e) {
+		public override bool OnTouchEvent(MotionEvent? e) {
 			bool handled = base.OnTouchEvent(e);
 			if (!handled) {
-				switch (e.Action) {
+				switch (e?.Action) {
 					case MotionEventActions.Down:
 						handled = OnTouchDownEvent(e);
 						break;
@@ -274,15 +274,15 @@ namespace OxyPlot.Xamarin.Android {
 		/// Draws the content of the control.
 		/// </summary>
 		/// <param name="canvas">The canvas to draw on.</param>
-		protected override void OnDraw(Canvas canvas) {
+		protected override void OnDraw(Canvas? canvas) {
 			base.OnDraw(canvas);
-			PlotModel actualModel = ActualModel;
+			PlotModel? actualModel = ActualModel;
 			if (actualModel == null) {
 				return;
 			}
 
 			if (actualModel.Background.IsVisible()) {
-				canvas.DrawColor(actualModel.Background.ToColor());
+				canvas?.DrawColor(actualModel.Background.ToColor());
 			} else {
 				// do nothing
 			}
@@ -297,18 +297,24 @@ namespace OxyPlot.Xamarin.Android {
 
 			lock (_renderingLock) {
 				if (_rc == null) {
-					DisplayMetrics displayMetrics = Context.Resources.DisplayMetrics;
+					DisplayMetrics? displayMetrics = Context?.Resources?.DisplayMetrics;
 
 					// The factors for scaling to Android's DPI and SPI units.
-					// The density independent pixel is equivalent to one physical pixel 
+					// The density independent pixel is equivalent to one physical pixel
 					// on a 160 dpi screen (baseline density)
-					Scale = displayMetrics.Density;
-					_rc = new CanvasRenderContext(Scale, displayMetrics.ScaledDensity);
+					if (displayMetrics != null) {
+						Scale = displayMetrics.Density;
+						_rc = new CanvasRenderContext(Scale, displayMetrics.ScaledDensity);
+					}
 				}
 
-				_rc.SetTarget(canvas);
+				if (canvas != null) {
+					_rc?.SetTarget(canvas);
+				}
 
-				((IPlotModel)actualModel).Render(_rc, new OxyRect(0, 0, Width / Scale, Height / Scale));
+				if (_rc != null) {
+					((IPlotModel)actualModel).Render(_rc, new OxyRect(0, 0, Width / Scale, Height / Scale));
+				}
 			}
 		}
 

@@ -34,7 +34,7 @@ namespace OxyPlot.Xamarin.Android
         /// </summary>
         /// <param name="join">The join value to convert.</param>
         /// <returns>The converted join value.</returns>
-        public static Paint.Join Convert(this LineJoin join)
+        public static Paint.Join? Convert(this LineJoin join)
         {
             switch (join)
             {
