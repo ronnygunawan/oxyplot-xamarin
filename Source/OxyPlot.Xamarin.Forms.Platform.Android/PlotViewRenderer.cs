@@ -1,7 +1,6 @@
 ﻿using Android.Content;
 using OxyPlot.Xamarin.Forms;
 using OxyPlot.Xamarin.Forms.Platform.Android;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 
@@ -42,7 +41,8 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 		/// Raises the element changed event.
 		/// </summary>
 		/// <param name="e">The event arguments.</param>
-		[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Assigned to a view holder")]
+		[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope",
+			Justification = "Assigned to a view holder")]
 		protected override void OnElementChanged(ElementChangedEventArgs<Xamarin.Forms.PlotView> e) {
 			base.OnElementChanged(e);
 			if (e.OldElement != null || Element == null) {
@@ -51,10 +51,11 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 
 			DetachModelFromView();
 
-			PlotView plotView = new(Context) {
-				Model = Element.Model,
-				Controller = Element.Controller
-			};
+			if (Context == null) {
+				return;
+			}
+
+			PlotView plotView = new(Context) {Model = Element.Model, Controller = Element.Controller};
 
 			plotView.SetBackgroundColor(Element.BackgroundColor.ToAndroid());
 
@@ -88,7 +89,7 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 
 		void DetachModelFromView() {
 			IPlotModel model = Element.Model;
-			model?.AttachPlotView(null);
+			model.AttachPlotView(null);
 		}
 	}
 }
