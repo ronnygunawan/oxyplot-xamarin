@@ -45,7 +45,7 @@ namespace OxyPlot.Xamarin.Forms {
 		/// Gets or sets the <see cref="PlotModel"/> to view.
 		/// </summary>
 		/// <value>The model.</value>
-		public PlotModel Model {
+		public PlotModel? Model {
 			get => (PlotModel)GetValue(ModelProperty);
 			set => SetValue(ModelProperty, value);
 		}
@@ -54,7 +54,7 @@ namespace OxyPlot.Xamarin.Forms {
 		/// Gets or sets the <see cref="PlotController"/> for the view.
 		/// </summary>
 		/// <value>The controller.</value>
-		public PlotController Controller {
+		public PlotController? Controller {
 			get => (PlotController)GetValue(ControllerProperty);
 			set => SetValue(ControllerProperty, value);
 		}

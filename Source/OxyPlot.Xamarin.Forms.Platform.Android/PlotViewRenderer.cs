@@ -26,8 +26,9 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PlotViewRenderer"/> class.
 		/// </summary>
-		public PlotViewRenderer(Context context) : base(context) {
-		}
+		public PlotViewRenderer(
+			Context context
+		) : base(context) { }
 
 		/// <summary>
 		/// Initializes the renderer.
@@ -41,11 +42,16 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 		/// Raises the element changed event.
 		/// </summary>
 		/// <param name="e">The event arguments.</param>
-		[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope",
-			Justification = "Assigned to a view holder")]
-		protected override void OnElementChanged(ElementChangedEventArgs<Xamarin.Forms.PlotView> e) {
+		[SuppressMessage(
+			"Reliability", "CA2000:Dispose objects before losing scope",
+			Justification = "Assigned to a view holder"
+		)]
+		protected override void OnElementChanged(
+			ElementChangedEventArgs<Xamarin.Forms.PlotView> e
+		) {
 			base.OnElementChanged(e);
-			if (e.OldElement != null || Element == null) {
+			if (e.OldElement != null
+				|| Element == null) {
 				return;
 			}
 
@@ -55,7 +61,7 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 				return;
 			}
 
-			PlotView plotView = new(Context) {Model = Element.Model, Controller = Element.Controller};
+			PlotView plotView = new(Context) { Model = Element.Model, Controller = Element.Controller };
 
 			plotView.SetBackgroundColor(Element.BackgroundColor.ToAndroid());
 
@@ -67,9 +73,13 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 		/// </summary>
 		/// <param name="sender">The sender.</param>
 		/// <param name="e">The event arguments.</param>
-		protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e) {
+		protected override void OnElementPropertyChanged(
+			object sender,
+			PropertyChangedEventArgs e
+		) {
 			base.OnElementPropertyChanged(sender, e);
-			if (Element == null || Control == null) {
+			if (Element == null
+				|| Control == null) {
 				return;
 			}
 
@@ -88,8 +98,8 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 		}
 
 		void DetachModelFromView() {
-			IPlotModel model = Element.Model;
-			model.AttachPlotView(null);
+			IPlotModel? model = Element.Model;
+			model?.AttachPlotView(null);
 		}
 	}
 }
