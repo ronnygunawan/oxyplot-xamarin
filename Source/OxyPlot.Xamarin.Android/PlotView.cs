@@ -7,6 +7,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+#nullable enable
+
 using Android.Content;
 using Android.Graphics;
 using Android.Util;

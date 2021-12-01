@@ -7,9 +7,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Android.Graphics;
 
@@ -418,7 +419,7 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="paint">The paint.</param>
 		/// <param name="defaultLineHeight">Default line height.</param>
 		/// <param name="delta">The vertical delta.</param>
-		private void GetFontMetrics(Paint paint, out float defaultLineHeight, out float delta) {
+		private static void GetFontMetrics(Paint paint, out float defaultLineHeight, out float delta) {
 			Paint.FontMetrics metrics = paint.GetFontMetrics()!;
 			float ascent = -metrics.Ascent;
 			float descent = metrics.Descent;
@@ -497,7 +498,6 @@ namespace OxyPlot.Xamarin.Android {
 		/// <param name="dashArray">The dash array.</param>
 		/// <param name="lineJoin">The line join.</param>
 		/// <param name="aliased">Use aliased strokes if set to <c>true</c>.</param>
-		[SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Not the right place to dispose")]
 		private void SetStroke(OxyColor stroke, double thickness, double[]? dashArray = null, LineJoin lineJoin = LineJoin.Miter, bool aliased = false) {
 			_paint.SetStyle(Paint.Style.Stroke);
 			_paint.Color = stroke.ToColor();
@@ -505,7 +505,9 @@ namespace OxyPlot.Xamarin.Android {
 			_paint.StrokeJoin = lineJoin.Convert();
 			if (dashArray != null) {
 				float[] dashArrayF = dashArray.Select(Convert).ToArray();
+#pragma warning disable CA2000 // Dispose objects before losing scope
 				DashPathEffect dashPathEffect = new(dashArrayF, 0f);
+#pragma warning restore CA2000 // Dispose objects before losing scope
 				_paint.SetPathEffect(dashPathEffect);
 			}
 

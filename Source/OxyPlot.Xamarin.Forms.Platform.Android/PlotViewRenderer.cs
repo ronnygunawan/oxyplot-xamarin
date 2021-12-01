@@ -1,4 +1,6 @@
-﻿using Android.Content;
+﻿#nullable enable
+
+using Android.Content;
 using OxyPlot.Xamarin.Forms;
 using OxyPlot.Xamarin.Forms.Platform.Android;
 using Xamarin.Forms;
