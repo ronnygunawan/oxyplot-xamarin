@@ -84,19 +84,17 @@
     <Compile Include="PlotViewRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OxyPlot.Xamarin.iOS\OxyPlot.Xamarin.iOS.csproj">
-      <Project>{191ABC81-B335-44D7-BE0D-3C5E9196FA8B}</Project>
-      <Name>OxyPlot.Xamarin.iOS</Name>
-      <IsAppExtension>false</IsAppExtension>
-      <IsWatchApp>false</IsWatchApp>
-    </ProjectReference>
-    <ProjectReference Include="..\OxyPlot.Xamarin.Forms\OxyPlot.Xamarin.Forms.csproj">
-      <Project>{B63C5F8C-61C8-4E69-93D6-F49F816D3746}</Project>
-      <Name>OxyPlot.Xamarin.Forms</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\OxyPlot.Xamarin.Forms\OxyPlot.Xamarin.Forms.csproj">
+      <Project>{ee895bb5-a5a0-442f-b03f-26f98bd15268}</Project>
+      <Name>OxyPlot.Xamarin.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OxyPlot.Xamarin.iOS\OxyPlot.Xamarin.iOS.csproj">
+      <Project>{191abc81-b335-44d7-be0d-3c5e9196fa8b}</Project>
+      <Name>OxyPlot.Xamarin.iOS</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

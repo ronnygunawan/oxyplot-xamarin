@@ -1,7 +1,7 @@
 ﻿using OxyPlot.Xamarin.Forms;
 using OxyPlot.Xamarin.Forms.Platform.iOS;
-using global::Xamarin.Forms;
-using global::Xamarin.Forms.Platform.iOS;
+using Xamarin.Forms;
+using Xamarin.Forms.Platform.iOS;
 
 // Exports the renderer.
 [assembly: ExportRenderer(typeof(PlotView), typeof(PlotViewRenderer))]
@@ -26,7 +26,8 @@ namespace OxyPlot.Xamarin.Forms.Platform.iOS
         /// <summary>
         /// Initializes a new instance of the <see cref="PlotViewRenderer"/> class.
         /// </summary>
-        public PlotViewRenderer()
+		// ReSharper disable once EmptyConstructor
+		public PlotViewRenderer()
         {
             // Do not delete
         }
@@ -52,14 +53,15 @@ namespace OxyPlot.Xamarin.Forms.Platform.iOS
                 return;
             }
 
-            var plotView = new PlotView
-            {
+#pragma warning disable CA2000
+			PlotView plotView = new() {
                 Model = this.Element.Model,
                 Controller = this.Element.Controller,
                 BackgroundColor = this.Element.BackgroundColor.ToOxyColor().ToUIColor()
             };
+#pragma warning restore CA2000
 
-            this.SetNativeControl(plotView);
+			this.SetNativeControl(plotView);
         }
 
         /// <summary>
