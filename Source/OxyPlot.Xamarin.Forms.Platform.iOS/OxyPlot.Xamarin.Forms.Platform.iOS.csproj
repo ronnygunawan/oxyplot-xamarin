@@ -94,6 +94,8 @@
     <ProjectReference Include="..\OxyPlot.Xamarin.iOS\OxyPlot.Xamarin.iOS.csproj">
       <Project>{191abc81-b335-44d7-be0d-3c5e9196fa8b}</Project>
       <Name>OxyPlot.Xamarin.iOS</Name>
+      <IsAppExtension>false</IsAppExtension>
+      <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
