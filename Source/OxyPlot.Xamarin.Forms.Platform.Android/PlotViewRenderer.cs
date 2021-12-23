@@ -99,7 +99,7 @@ namespace OxyPlot.Xamarin.Forms.Platform.Android {
 			}
 		}
 
-		void DetachModelFromView() {
+		private void DetachModelFromView() {
 			IPlotModel? model = Element.Model;
 			model?.AttachPlotView(null);
 		}

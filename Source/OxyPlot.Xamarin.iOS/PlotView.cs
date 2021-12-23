@@ -1,3 +1,4 @@
+#nullable enable
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PlotView.cs" company="OxyPlot">
 //   Copyright (c) 2014 OxyPlot contributors
@@ -43,7 +44,7 @@ namespace OxyPlot.Xamarin.iOS {
 		/// Initializes a new instance of the <see cref="OxyPlot.Xamarin.iOS.PlotView"/> class.
 		/// </summary>
 		public PlotView() {
-			this.Initialize();
+			Initialize();
 		}
 
 		/// <summary>
@@ -53,7 +54,7 @@ namespace OxyPlot.Xamarin.iOS {
 		public PlotView(
 			CGRect frame
 		) : base(frame) {
-			this.Initialize();
+			Initialize();
 		}
 
 		/// <summary>
@@ -64,7 +65,7 @@ namespace OxyPlot.Xamarin.iOS {
 		public PlotView(
 			NSCoder coder
 		) : base(coder) {
-			this.Initialize();
+			Initialize();
 		}
 
 		/// <summary>
@@ -81,22 +82,22 @@ namespace OxyPlot.Xamarin.iOS {
 		/// Initialize the view.
 		/// </summary>
 		private void Initialize() {
-			this.UserInteractionEnabled = true;
-			this.MultipleTouchEnabled = true;
-			this.BackgroundColor = UIColor.White;
-			this.KeepAspectRatioWhenPinching = true;
+			UserInteractionEnabled = true;
+			MultipleTouchEnabled = true;
+			BackgroundColor = UIColor.White;
+			KeepAspectRatioWhenPinching = true;
 
-			this._panZoomGesture.AddTarget(this.HandlePanZoomGesture);
-			this._tapGesture.AddTarget(this.HandleTapGesture);
+			_panZoomGesture.AddTarget(HandlePanZoomGesture);
+			_tapGesture.AddTarget(HandleTapGesture);
 			//Prevent panZoom and tap gestures from being recognized simultaneously
-			this._tapGesture.RequireGestureRecognizerToFail(this._panZoomGesture);
+			_tapGesture.RequireGestureRecognizerToFail(_panZoomGesture);
 
 			// Do not intercept touches on overlapping views
-			this._panZoomGesture.ShouldReceiveTouch += (
+			_panZoomGesture.ShouldReceiveTouch += (
 				_,
 				touch
 			) => ReferenceEquals(touch.View, this);
-			this._tapGesture.ShouldReceiveTouch += (
+			_tapGesture.ShouldReceiveTouch += (
 				_,
 				touch
 			) => ReferenceEquals(touch.View, this);
@@ -107,22 +108,22 @@ namespace OxyPlot.Xamarin.iOS {
 		/// </summary>
 		/// <value>The <see cref="PlotModel"/>.</value>
 		public PlotModel? Model {
-			get => this._model;
+			get => _model;
 
 			set {
-				if (this._model == value) return;
+				if (_model == value) return;
 
-				if (this._model != null) {
-					((IPlotModel)this._model).AttachPlotView(null);
-					this._model = null;
+				if (_model != null) {
+					((IPlotModel)_model).AttachPlotView(null);
+					_model = null;
 				}
 
 				if (value != null) {
 					((IPlotModel)value).AttachPlotView(this);
-					this._model = value;
+					_model = value;
 				}
 
-				this.InvalidatePlot();
+				InvalidatePlot();
 			}
 		}
 
@@ -138,13 +139,13 @@ namespace OxyPlot.Xamarin.iOS {
 		/// <value>
 		/// The actual model.
 		/// </value>
-		Model? IView.ActualModel => this.Model;
+		Model? IView.ActualModel => Model;
 
 		/// <summary>
 		/// Gets the actual <see cref="PlotModel"/> to show.
 		/// </summary>
 		/// <value>The actual model.</value>
-		public PlotModel? ActualModel => this.Model;
+		public PlotModel? ActualModel => Model;
 
 		/// <summary>
 		/// Gets the actual controller.
@@ -152,7 +153,7 @@ namespace OxyPlot.Xamarin.iOS {
 		/// <value>
 		/// The actual <see cref="IController" />.
 		/// </value>
-		IController IView.ActualController => this.ActualController;
+		IController IView.ActualController => ActualController;
 
 		/// <summary>
 		/// Gets the coordinates of the client area of the view.
@@ -165,15 +166,15 @@ namespace OxyPlot.Xamarin.iOS {
 		/// Gets the actual <see cref="IPlotController"/>.
 		/// </summary>
 		/// <value>The actual plot controller.</value>
-		public IPlotController ActualController => this.Controller ?? (this._defaultController ??= new PlotController());
+		public IPlotController ActualController => Controller ?? (_defaultController ??= new PlotController());
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="OxyPlot.Xamarin.iOS.PlotView"/> keeps the aspect ratio when pinching.
 		/// </summary>
 		/// <value><c>true</c> if keep aspect ratio when pinching; otherwise, <c>false</c>.</value>
 		public bool KeepAspectRatioWhenPinching {
-			get => this._panZoomGesture.KeepAspectRatioWhenPinching;
-			set => this._panZoomGesture.KeepAspectRatioWhenPinching = value;
+			get => _panZoomGesture.KeepAspectRatioWhenPinching;
+			set => _panZoomGesture.KeepAspectRatioWhenPinching = value;
 		}
 
 		/// <summary>
@@ -181,8 +182,8 @@ namespace OxyPlot.Xamarin.iOS {
 		/// (only applies if KeepAspectRatioWhenPinching == false)
 		/// </summary>
 		public double ZoomThreshold {
-			get => this._panZoomGesture.ZoomThreshold;
-			set => this._panZoomGesture.ZoomThreshold = value;
+			get => _panZoomGesture.ZoomThreshold;
+			set => _panZoomGesture.ZoomThreshold = value;
 		}
 
 		/// <summary>
@@ -191,8 +192,8 @@ namespace OxyPlot.Xamarin.iOS {
 		/// instead simply stop the zoom at that point.
 		/// </summary>
 		public bool AllowPinchPastZero {
-			get => this._panZoomGesture.AllowPinchPastZero;
-			set => this._panZoomGesture.AllowPinchPastZero = value;
+			get => _panZoomGesture.AllowPinchPastZero;
+			set => _panZoomGesture.AllowPinchPastZero = value;
 		}
 
 		/// <summary>
@@ -212,11 +213,11 @@ namespace OxyPlot.Xamarin.iOS {
 		public void InvalidatePlot(
 			bool updateData = true
 		) {
-			PlotModel? actualModel = this._model;
+			PlotModel? actualModel = _model;
 			// TODO: update the model on a background thread
 			(actualModel as IPlotModel)?.Update(updateData);
 
-			this.SetNeedsDisplay();
+			SetNeedsDisplay();
 		}
 
 		/// <summary>
@@ -269,7 +270,7 @@ namespace OxyPlot.Xamarin.iOS {
 		public override void Draw(
 			CGRect rect
 		) {
-			if (this._model is not IPlotModel actualModel) return;
+			if (_model is not IPlotModel actualModel) return;
 
 			CGContext context = UIGraphics.GetCurrentContext();
 			using CoreGraphicsRenderContext renderer = new(context);
@@ -295,7 +296,7 @@ namespace OxyPlot.Xamarin.iOS {
 		) {
 			base.MotionBegan(motion, evt);
 			if (motion == UIEventSubtype.MotionShake) {
-				this.ActualController.HandleGesture(this, new OxyShakeGesture(), new OxyKeyEventArgs());
+				ActualController.HandleGesture(this, new OxyShakeGesture(), new OxyKeyEventArgs());
 			}
 		}
 
@@ -308,37 +309,37 @@ namespace OxyPlot.Xamarin.iOS {
 			UIView? newsuper
 		) {
 			if (newsuper == null) {
-				this.RemoveGestureRecognizer(this._panZoomGesture);
-				this.RemoveGestureRecognizer(this._tapGesture);
+				RemoveGestureRecognizer(_panZoomGesture);
+				RemoveGestureRecognizer(_tapGesture);
 			}
 			// ReSharper disable once ConditionIsAlwaysTrueOrFalse
-			else if (this.Superview == null) {
-				this.AddGestureRecognizer(this._panZoomGesture);
-				this.AddGestureRecognizer(this._tapGesture);
+			else if (Superview == null) {
+				AddGestureRecognizer(_panZoomGesture);
+				AddGestureRecognizer(_tapGesture);
 			}
 
 			base.WillMoveToSuperview(newsuper);
 		}
 
 		private void HandlePanZoomGesture() {
-			switch (this._panZoomGesture.State) {
+			switch (_panZoomGesture.State) {
 				case UIGestureRecognizerState.Began:
-					this.ActualController.HandleTouchStarted(this, this._panZoomGesture.TouchEventArgs);
+					ActualController.HandleTouchStarted(this, _panZoomGesture.TouchEventArgs);
 					break;
 				case UIGestureRecognizerState.Changed:
-					this.ActualController.HandleTouchDelta(this, this._panZoomGesture.TouchEventArgs);
+					ActualController.HandleTouchDelta(this, _panZoomGesture.TouchEventArgs);
 					break;
 				case UIGestureRecognizerState.Ended:
 				case UIGestureRecognizerState.Cancelled:
-					this.ActualController.HandleTouchCompleted(this, this._panZoomGesture.TouchEventArgs);
+					ActualController.HandleTouchCompleted(this, _panZoomGesture.TouchEventArgs);
 					break;
 			}
 		}
 
 		private void HandleTapGesture() {
-			CGPoint location = this._tapGesture.LocationInView(this);
-			this.ActualController.HandleTouchStarted(this, location.ToTouchEventArgs());
-			this.ActualController.HandleTouchCompleted(this, location.ToTouchEventArgs());
+			CGPoint location = _tapGesture.LocationInView(this);
+			ActualController.HandleTouchStarted(this, location.ToTouchEventArgs());
+			ActualController.HandleTouchCompleted(this, location.ToTouchEventArgs());
 		}
 	}
 }

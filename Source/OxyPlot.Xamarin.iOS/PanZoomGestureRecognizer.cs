@@ -1,3 +1,4 @@
+﻿#nullable enable
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PanZoomGestureRecognizer.cs" company="OxyPlot">
 //   Copyright (c) 2014 OxyPlot contributors
@@ -48,8 +49,8 @@ namespace OxyPlot.MonoTouch
 		/// To add methods that will be invoked upon recognition, you can use the AddTarget method.
 		/// </remarks>
 		public PanZoomGestureRecognizer() {
-			this.ZoomThreshold = 20d;
-			this.AllowPinchPastZero = true;
+			ZoomThreshold = 20d;
+			AllowPinchPastZero = true;
 		}
 
 		/// <summary>
@@ -91,24 +92,24 @@ namespace OxyPlot.MonoTouch
 		) {
 			base.TouchesBegan(touches, evt);
 
-			if (this._activeTouches.Count >= 2) {
+			if (_activeTouches.Count >= 2) {
 				// we already have two touches
 				return;
 			}
 
 			// Grab 1-2 touches to track
 			UITouch[] newTouches = touches.ToArray<UITouch>();
-			bool firstTouch = this._activeTouches.Count == 0;
+			bool firstTouch = _activeTouches.Count == 0;
 
-			this._activeTouches.AddRange(newTouches.Take(2 - this._activeTouches.Count));
+			_activeTouches.AddRange(newTouches.Take(2 - _activeTouches.Count));
 
 			if (firstTouch) {
 				// HandleTouchStarted initializes the entire multitouch gesture,
 				// with the first touch used for panning.
-				this.TouchEventArgs = this._activeTouches.First().ToTouchEventArgs(this.View);
+				TouchEventArgs = _activeTouches[0].ToTouchEventArgs(View);
 			}
 
-			this.CalculateStartingDistance();
+			CalculateStartingDistance();
 		}
 
 		/// <summary>
@@ -122,38 +123,38 @@ namespace OxyPlot.MonoTouch
 		) {
 			base.TouchesMoved(touches, evt);
 
-			if (!this._activeTouches.Any(touch => touch.Phase == UITouchPhase.Moved)) return;
+			if (!_activeTouches.Any(touch => touch.Phase == UITouchPhase.Moved)) return;
 
 			// get current and previous location of the first touch point
-			UITouch t1 = this._activeTouches[0];
-			ScreenPoint l1 = t1.LocationInView(this.View).ToScreenPoint();
+			UITouch t1 = _activeTouches[0];
+			ScreenPoint l1 = t1.LocationInView(View).ToScreenPoint();
 			ScreenPoint pl1 = t1.Phase == UITouchPhase.Moved
-				? t1.PreviousLocationInView(this.View).ToScreenPoint()
+				? t1.PreviousLocationInView(View).ToScreenPoint()
 				: l1;
 
 			ScreenPoint l = l1;
 			ScreenVector t = l1 - pl1;
-			ScreenVector s = new ScreenVector(1, 1);
+			ScreenVector s = new(1, 1);
 
-			if (this._activeTouches.Count > 1) {
+			if (_activeTouches.Count > 1) {
 				// get current and previous location of the second touch point
-				UITouch t2 = this._activeTouches[1];
-				ScreenPoint l2 = t2.LocationInView(this.View).ToScreenPoint();
+				UITouch t2 = _activeTouches[1];
+				ScreenPoint l2 = t2.LocationInView(View).ToScreenPoint();
 				ScreenPoint pl2 = t2.Phase == UITouchPhase.Moved
-					? t2.PreviousLocationInView(this.View).ToScreenPoint()
+					? t2.PreviousLocationInView(View).ToScreenPoint()
 					: l2;
 
 				ScreenVector d = l1 - l2;
 				ScreenVector pd = pl1 - pl2;
 
-				if (!this.KeepAspectRatioWhenPinching) {
-					if (!this.AllowPinchPastZero) {
+				if (!KeepAspectRatioWhenPinching) {
+					if (!AllowPinchPastZero) {
 						// Don't allow fingers crossing in a zoom-out gesture to turn it back into a zoom-in gesture
-						d = this.PreventCross(d);
+						d = PreventCross(d);
 					}
 
-					double scaleX = this.CalculateScaleFactor(d.X, pd.X);
-					double scaleY = this.CalculateScaleFactor(d.Y, pd.Y);
+					double scaleX = CalculateScaleFactor(d.X, pd.X);
+					double scaleY = CalculateScaleFactor(d.Y, pd.Y);
 					s = new ScreenVector(scaleX, scaleY);
 				} else {
 					double scale = pd.Length > 0
@@ -168,8 +169,8 @@ namespace OxyPlot.MonoTouch
 				DeltaTranslation = t,
 				DeltaScale = s
 			};
-			this.TouchEventArgs = e;
-			this.State = UIGestureRecognizerState.Changed;
+			TouchEventArgs = e;
+			State = UIGestureRecognizerState.Changed;
 		}
 
 		/// <summary>
@@ -184,15 +185,15 @@ namespace OxyPlot.MonoTouch
 			base.TouchesEnded(touches, evt);
 
 			// We already have the only two touches we care about, so ignore the params
-			UITouch? secondTouch = this._activeTouches.ElementAtOrDefault(1);
+			UITouch? secondTouch = _activeTouches.ElementAtOrDefault(1);
 
 			if (secondTouch is {
 				Phase: UITouchPhase.Ended
 			}) {
-				this._activeTouches.Remove(secondTouch);
+				_activeTouches.Remove(secondTouch);
 			}
 
-			UITouch? firstTouch = this._activeTouches.FirstOrDefault();
+			UITouch? firstTouch = _activeTouches.FirstOrDefault();
 
 			if (firstTouch is not {
 				Phase: UITouchPhase.Ended
@@ -200,13 +201,13 @@ namespace OxyPlot.MonoTouch
 				return;
 			}
 
-			this._activeTouches.Remove(firstTouch);
+			_activeTouches.Remove(firstTouch);
 
-			if (this._activeTouches.Count > 0) return;
+			if (_activeTouches.Count > 0) return;
 
-			this.TouchEventArgs = firstTouch.ToTouchEventArgs(this.View);
+			TouchEventArgs = firstTouch.ToTouchEventArgs(View);
 
-			this.State = this.State == UIGestureRecognizerState.Possible
+			State = State == UIGestureRecognizerState.Possible
 				? UIGestureRecognizerState.Failed
 				: UIGestureRecognizerState.Ended;
 		}
@@ -227,15 +228,15 @@ namespace OxyPlot.MonoTouch
 			// and handle that scenario.
 
 			// We already have the only two touches we care about, so ignore the params
-			UITouch? secondTouch = this._activeTouches.ElementAtOrDefault(1);
+			UITouch? secondTouch = _activeTouches.ElementAtOrDefault(1);
 
 			if (secondTouch is {
 				Phase: UITouchPhase.Cancelled
 			}) {
-				this._activeTouches.Remove(secondTouch);
+				_activeTouches.Remove(secondTouch);
 			}
 
-			UITouch? firstTouch = this._activeTouches.FirstOrDefault();
+			UITouch? firstTouch = _activeTouches.FirstOrDefault();
 
 			if (firstTouch is not {
 				Phase: UITouchPhase.Cancelled
@@ -243,13 +244,13 @@ namespace OxyPlot.MonoTouch
 				return;
 			}
 
-			this._activeTouches.Remove(firstTouch);
+			_activeTouches.Remove(firstTouch);
 
-			if (this._activeTouches.Count > 0) return;
+			if (_activeTouches.Count > 0) return;
 
-			this.TouchEventArgs = firstTouch.ToTouchEventArgs(this.View);
+			TouchEventArgs = firstTouch.ToTouchEventArgs(View);
 
-			this.State = this.State == UIGestureRecognizerState.Possible
+			State = State == UIGestureRecognizerState.Possible
 				? UIGestureRecognizerState.Failed
 				: UIGestureRecognizerState.Cancelled;
 		}
@@ -277,8 +278,8 @@ namespace OxyPlot.MonoTouch
 			double distance,
 			double previousDistance
 		) {
-			return Math.Abs(previousDistance) > this.ZoomThreshold
-				&& Math.Abs(distance) > this.ZoomThreshold
+			return Math.Abs(previousDistance) > ZoomThreshold
+				&& Math.Abs(distance) > ZoomThreshold
 					? Math.Abs(distance / previousDistance)
 					: 1;
 		}
@@ -287,15 +288,15 @@ namespace OxyPlot.MonoTouch
 		/// Calculates the starting distance.
 		/// </summary>
 		private void CalculateStartingDistance() {
-			if (this._activeTouches.Count < 2) {
-				this._startingDistance = default(ScreenVector);
+			if (_activeTouches.Count < 2) {
+				_startingDistance = default(ScreenVector);
 				return;
 			}
 
-			ScreenPoint loc1 = this._activeTouches.ElementAt(0).LocationInView(this.View).ToScreenPoint();
-			ScreenPoint loc2 = this._activeTouches.ElementAt(1).LocationInView(this.View).ToScreenPoint();
+			ScreenPoint loc1 = _activeTouches[0].LocationInView(View).ToScreenPoint();
+			ScreenPoint loc2 = _activeTouches[1].LocationInView(View).ToScreenPoint();
 
-			this._startingDistance = loc1 - loc2;
+			_startingDistance = loc1 - loc2;
 		}
 
 		/// <summary>
@@ -309,11 +310,11 @@ namespace OxyPlot.MonoTouch
 			double x = currentDistance.X;
 			double y = currentDistance.Y;
 
-			if (DidDirectionChange(x, this._startingDistance.X)) {
+			if (DidDirectionChange(x, _startingDistance.X)) {
 				x = 0;
 			}
 
-			if (DidDirectionChange(y, this._startingDistance.Y)) {
+			if (DidDirectionChange(y, _startingDistance.Y)) {
 				y = 0;
 			}
 

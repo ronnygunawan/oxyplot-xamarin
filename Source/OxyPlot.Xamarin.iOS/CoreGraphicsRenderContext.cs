@@ -1,3 +1,4 @@
+#nullable enable
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CoreGraphicsRenderContext.cs" company="OxyPlot">
 //   Copyright (c) 2014 OxyPlot contributors
@@ -51,16 +52,16 @@ namespace OxyPlot.Xamarin.iOS {
 		public CoreGraphicsRenderContext(
 			CGContext context
 		) {
-			this._gCtx = context;
+			_gCtx = context;
 
 			// Set rendering quality
-			this._gCtx.SetAllowsFontSmoothing(true);
-			this._gCtx.SetAllowsFontSubpixelQuantization(true);
-			this._gCtx.SetAllowsAntialiasing(true);
-			this._gCtx.SetShouldSmoothFonts(true);
-			this._gCtx.SetShouldAntialias(true);
-			this._gCtx.InterpolationQuality = CGInterpolationQuality.High;
-			this._gCtx.SetTextDrawingMode(CGTextDrawingMode.Fill);
+			_gCtx.SetAllowsFontSmoothing(true);
+			_gCtx.SetAllowsFontSubpixelQuantization(true);
+			_gCtx.SetAllowsAntialiasing(true);
+			_gCtx.SetShouldSmoothFonts(true);
+			_gCtx.SetShouldAntialias(true);
+			_gCtx.InterpolationQuality = CGInterpolationQuality.High;
+			_gCtx.SetTextDrawingMode(CGTextDrawingMode.Fill);
 		}
 
 		/// <summary>
@@ -78,32 +79,32 @@ namespace OxyPlot.Xamarin.iOS {
 			double thickness,
 			EdgeRenderingMode edgeRenderingMode
 		) {
-			this.SetAlias(false);
+			SetAlias(false);
 			CGRect convertedRectangle = rect.Convert();
 			if (fill.IsVisible()) {
-				this._gCtx.SaveState();
-				using CGColor fillColor = this.SetFill(fill);
+				_gCtx.SaveState();
+				using CGColor fillColor = SetFill(fill);
 				using (CGPath path = new()) {
 					path.AddEllipseInRect(convertedRectangle);
-					this._gCtx.AddPath(path);
+					_gCtx.AddPath(path);
 				}
 
-				this._gCtx.DrawPath(CGPathDrawingMode.Fill);
-				this._gCtx.RestoreState();
+				_gCtx.DrawPath(CGPathDrawingMode.Fill);
+				_gCtx.RestoreState();
 			}
 
 			if (stroke.IsVisible()
 				&& thickness > 0) {
-				this._gCtx.SaveState();
-				using CGColor strokeColor = this.SetStroke(stroke, thickness);
+				_gCtx.SaveState();
+				using CGColor strokeColor = SetStroke(stroke, thickness);
 
 				using (CGPath path = new()) {
 					path.AddEllipseInRect(convertedRectangle);
-					this._gCtx.AddPath(path);
+					_gCtx.AddPath(path);
 				}
 
-				this._gCtx.DrawPath(CGPathDrawingMode.Stroke);
-				this._gCtx.RestoreState();
+				_gCtx.DrawPath(CGPathDrawingMode.Stroke);
+				_gCtx.RestoreState();
 			}
 		}
 
@@ -134,24 +135,24 @@ namespace OxyPlot.Xamarin.iOS {
 			double opacity,
 			bool interpolate
 		) {
-			UIImage? image = this.GetImage(source);
+			UIImage? image = GetImage(source);
 			if (image == null) {
 				return;
 			}
 
-			this._gCtx.SaveState();
+			_gCtx.SaveState();
 
 			double x = destX - (srcX / srcWidth * destWidth);
 			double y = destY - (srcY / srcHeight * destHeight);
-			this._gCtx.ScaleCTM(1, -1);
-			this._gCtx.TranslateCTM((float)x, -(float)(y + destHeight));
-			this._gCtx.SetAlpha((float)opacity);
-			this._gCtx.InterpolationQuality = interpolate
+			_gCtx.ScaleCTM(1, -1);
+			_gCtx.TranslateCTM((float)x, -(float)(y + destHeight));
+			_gCtx.SetAlpha((float)opacity);
+			_gCtx.InterpolationQuality = interpolate
 				? CGInterpolationQuality.High
 				: CGInterpolationQuality.None;
-			CGRect destRect = new CGRect(0f, 0f, (float)destWidth, (float)destHeight);
-			this._gCtx.DrawImage(destRect, image.CGImage);
-			this._gCtx.RestoreState();
+			CGRect destRect = new(0f, 0f, (float)destWidth, (float)destHeight);
+			_gCtx.DrawImage(destRect, image.CGImage);
+			_gCtx.RestoreState();
 		}
 
 		/// <summary>
@@ -159,14 +160,14 @@ namespace OxyPlot.Xamarin.iOS {
 		/// </summary>
 		/// <remarks>This method is called at the end of each rendering.</remarks>
 		public override void CleanUp() {
-			List<OxyImage> imagesToRelease = this._imageCache.Keys.Where(i => !this._imagesInUse.Contains(i)).ToList();
+			List<OxyImage> imagesToRelease = _imageCache.Keys.Where(i => !_imagesInUse.Contains(i)).ToList();
 			foreach (OxyImage i in imagesToRelease) {
-				UIImage? image = this.GetImage(i);
+				UIImage? image = GetImage(i);
 				image?.Dispose();
-				this._imageCache.Remove(i);
+				_imageCache.Remove(i);
 			}
 
-			this._imagesInUse.Clear();
+			_imagesInUse.Clear();
 		}
 
 		/// <summary>
@@ -177,8 +178,8 @@ namespace OxyPlot.Xamarin.iOS {
 		public override void PushClip(
 			OxyRect rect
 		) {
-			this._gCtx.SaveState();
-			this._gCtx.ClipToRect(rect.Convert());
+			_gCtx.SaveState();
+			_gCtx.ClipToRect(rect.Convert());
 			_clipCount++;
 		}
 
@@ -186,7 +187,7 @@ namespace OxyPlot.Xamarin.iOS {
 		/// Resets the clip rectangle.
 		/// </summary>
 		public override void PopClip() {
-			this._gCtx.RestoreState();
+			_gCtx.RestoreState();
 			_clipCount--;
 		}
 
@@ -212,20 +213,20 @@ namespace OxyPlot.Xamarin.iOS {
 				return;
 			}
 
-			this._gCtx.RestoreState();
-			this.SetAlias(edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
-			using CGColor strokeColor = this.SetStroke(stroke, thickness, dashArray, lineJoin);
+			_gCtx.SaveState();
+			SetAlias(edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
+			using CGColor strokeColor = SetStroke(stroke, thickness, dashArray, lineJoin);
 
 			using (CGPath path = new()) {
 				CGPoint[] convertedPoints = (edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy
 					? points.Select(p => p.ConvertAliased())
 					: points.Select(p => p.Convert())).ToArray();
 				path.AddLines(convertedPoints);
-				this._gCtx.AddPath(path);
+				_gCtx.AddPath(path);
 			}
 
-			this._gCtx.DrawPath(CGPathDrawingMode.Stroke);
-			this._gCtx.RestoreState();
+			_gCtx.DrawPath(CGPathDrawingMode.Stroke);
+			_gCtx.RestoreState();
 		}
 
 		/// <summary>
@@ -247,36 +248,36 @@ namespace OxyPlot.Xamarin.iOS {
 			double[] dashArray,
 			LineJoin lineJoin
 		) {
-			this.SetAlias(edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
+			SetAlias(edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy);
 			CGPoint[] convertedPoints = (edgeRenderingMode == EdgeRenderingMode.PreferGeometricAccuracy
 				? points.Select(p => p.ConvertAliased())
 				: points.Select(p => p.Convert())).ToArray();
 			if (fill.IsVisible()) {
-				this._gCtx.SaveState();
-				using CGColor fillColor = this.SetFill(fill);
+				_gCtx.SaveState();
+				using CGColor fillColor = SetFill(fill);
 				using (CGPath path = new()) {
 					path.AddLines(convertedPoints);
 					path.CloseSubpath();
-					this._gCtx.AddPath(path);
+					_gCtx.AddPath(path);
 				}
 
-				this._gCtx.DrawPath(CGPathDrawingMode.Fill);
-				this._gCtx.RestoreState();
+				_gCtx.DrawPath(CGPathDrawingMode.Fill);
+				_gCtx.RestoreState();
 			}
 
 			if (stroke.IsVisible()
 				&& thickness > 0) {
-				this._gCtx.SaveState();
-				using CGColor strokeColor = this.SetStroke(stroke, thickness, dashArray, lineJoin);
+				_gCtx.SaveState();
+				using CGColor strokeColor = SetStroke(stroke, thickness, dashArray, lineJoin);
 
 				using (CGPath path = new()) {
 					path.AddLines(convertedPoints);
 					path.CloseSubpath();
-					this._gCtx.AddPath(path);
+					_gCtx.AddPath(path);
 				}
 
-				this._gCtx.DrawPath(CGPathDrawingMode.Stroke);
-				this._gCtx.RestoreState();
+				_gCtx.DrawPath(CGPathDrawingMode.Stroke);
+				_gCtx.RestoreState();
 			}
 		}
 
@@ -295,32 +296,32 @@ namespace OxyPlot.Xamarin.iOS {
 			double thickness,
 			EdgeRenderingMode edgeRenderingMode
 		) {
-			this.SetAlias(true);
+			SetAlias(true);
 			CGRect convertedRect = rect.ConvertAliased();
 
 			if (fill.IsVisible()) {
-				this._gCtx.SaveState();
-				using CGColor fillColor = this.SetFill(fill);
+				_gCtx.SaveState();
+				using CGColor fillColor = SetFill(fill);
 				using (CGPath path = new()) {
 					path.AddRect(convertedRect);
-					this._gCtx.AddPath(path);
+					_gCtx.AddPath(path);
 				}
 
-				this._gCtx.DrawPath(CGPathDrawingMode.Fill);
-				this._gCtx.RestoreState();
+				_gCtx.DrawPath(CGPathDrawingMode.Fill);
+				_gCtx.RestoreState();
 			}
 
 			if (stroke.IsVisible()
 				&& thickness > 0) {
-				this._gCtx.SaveState();
-				using CGColor strokeColor = this.SetStroke(stroke, thickness);
+				_gCtx.SaveState();
+				using CGColor strokeColor = SetStroke(stroke, thickness);
 				using (CGPath path = new()) {
 					path.AddRect(convertedRect);
-					this._gCtx.AddPath(path);
+					_gCtx.AddPath(path);
 				}
 
-				this._gCtx.DrawPath(CGPathDrawingMode.Stroke);
-				this._gCtx.RestoreState();
+				_gCtx.DrawPath(CGPathDrawingMode.Stroke);
+				_gCtx.RestoreState();
 			}
 		}
 
@@ -355,7 +356,7 @@ namespace OxyPlot.Xamarin.iOS {
 
 			string fontName = GetActualFontName(fontFamily, fontWeight);
 
-			CTFont font = this.GetCachedFont(fontName, fontSize);
+			CTFont font = GetCachedFont(fontName, fontSize);
 			using NSAttributedString attributedString = new(
 				text, new CTStringAttributes {
 					ForegroundColorFromContext = true,
@@ -366,10 +367,10 @@ namespace OxyPlot.Xamarin.iOS {
 			nfloat width;
 			nfloat height;
 
-			this._gCtx.TextPosition = new CGPoint(0, 0);
+			_gCtx.TextPosition = new CGPoint(0, 0);
 
-			this.GetFontMetrics(font, out nfloat lineHeight, out nfloat delta);
-			CGRect bounds = textLine.GetImageBounds(this._gCtx);
+			GetFontMetrics(font, out nfloat lineHeight, out nfloat delta);
+			CGRect bounds = textLine.GetImageBounds(_gCtx);
 
 			if (maxSize.HasValue
 				|| halign != HorizontalAlignment.Left
@@ -403,26 +404,26 @@ namespace OxyPlot.Xamarin.iOS {
 			nfloat x0 = -bounds.Left;
 			nfloat y0 = delta;
 
-			CGColor fillColor = this.SetFill(fill);
-			this.SetAlias(false);
+			CGColor fillColor = SetFill(fill);
+			SetAlias(false);
 
-			this._gCtx.SaveState();
-			this._gCtx.TranslateCTM((float)p.X, (float)p.Y);
+			_gCtx.SaveState();
+			_gCtx.TranslateCTM((float)p.X, (float)p.Y);
 			if (!rotate.Equals(0)) {
-				this._gCtx.RotateCTM((float)(rotate / 180 * Math.PI));
+				_gCtx.RotateCTM((float)(rotate / 180 * Math.PI));
 			}
 
-			this._gCtx.TranslateCTM((float)dx + x0, (float)dy + y0);
-			this._gCtx.ScaleCTM(1f, -1f);
+			_gCtx.TranslateCTM((float)dx + x0, (float)dy + y0);
+			_gCtx.ScaleCTM(1f, -1f);
 
 			if (maxSize.HasValue) {
 				CGRect clipRect = new(-x0, y0, (float)Math.Ceiling(width), (float)Math.Ceiling(height));
-				this._gCtx.ClipToRect(clipRect);
+				_gCtx.ClipToRect(clipRect);
 			}
 
-			textLine.Draw(this._gCtx);
+			textLine.Draw(_gCtx);
 
-			this._gCtx.RestoreState();
+			_gCtx.RestoreState();
 			fillColor.Dispose();
 		}
 
@@ -448,7 +449,7 @@ namespace OxyPlot.Xamarin.iOS {
 			}
 
 			string fontName = GetActualFontName(fontFamily, fontWeight);
-			CTFont font = this.GetCachedFont(fontName, (float)fontSize);
+			CTFont font = GetCachedFont(fontName, (float)fontSize);
 			using NSAttributedString attributedString = new(
 				text, new CTStringAttributes {
 					ForegroundColorFromContext = true,
@@ -456,9 +457,9 @@ namespace OxyPlot.Xamarin.iOS {
 				}
 			);
 			using CTLine textLine = new(attributedString);
-			this.GetFontMetrics(font, out nfloat lineHeight, out nfloat _);
-			this._gCtx.TextPosition = new CGPoint(0, 0);
-			CGRect bounds = textLine.GetImageBounds(this._gCtx);
+			GetFontMetrics(font, out nfloat lineHeight, out nfloat _);
+			_gCtx.TextPosition = new CGPoint(0, 0);
+			CGRect bounds = textLine.GetImageBounds(_gCtx);
 			return new OxySize(bounds.Left + bounds.Width, lineHeight);
 		}
 
@@ -472,11 +473,11 @@ namespace OxyPlot.Xamarin.iOS {
 		/// <see cref="OxyPlot.Xamarin.iOS.CoreGraphicsRenderContext"/> so the garbage collector can reclaim the memory that
 		/// the <see cref="OxyPlot.Xamarin.iOS.CoreGraphicsRenderContext"/> was occupying.</remarks>
 		public void Dispose() {
-			foreach (UIImage? image in this._imageCache.Values) {
+			foreach (UIImage? image in _imageCache.Values) {
 				image?.Dispose();
 			}
 
-			foreach (CTFont font in this._fonts.Values) {
+			foreach (CTFont font in _fonts.Values) {
 				font.Dispose();
 			}
 		}
@@ -491,27 +492,13 @@ namespace OxyPlot.Xamarin.iOS {
 			string fontFamily,
 			double fontWeight
 		) {
-			string fontName;
-			switch (fontFamily) {
-				case null:
-				case "Segoe UI":
-					fontName = "HelveticaNeue";
-					break;
-				case "Arial":
-					fontName = "ArialMT";
-					break;
-				case "Times":
-				case "Times New Roman":
-					fontName = "TimesNewRomanPSMT";
-					break;
-				case "Courier New":
-					fontName = "CourierNewPSMT";
-					break;
-				default:
-					fontName = fontFamily;
-					break;
-			}
-
+			string fontName = fontFamily switch {
+				null or "Segoe UI" => "HelveticaNeue",
+				"Arial" => "ArialMT",
+				"Times" or "Times New Roman" => "TimesNewRomanPSMT",
+				"Courier New" => "CourierNewPSMT",
+				_ => fontFamily,
+			};
 			if (fontWeight >= 700) {
 				fontName += "-Bold";
 			}
@@ -558,11 +545,11 @@ namespace OxyPlot.Xamarin.iOS {
 			double fontSize
 		) {
 			string key = $"{fontName}{fontSize:0.###}";
-			if (this._fonts.TryGetValue(key, out CTFont? font)) {
+			if (_fonts.TryGetValue(key, out CTFont? font)) {
 				return font;
 			}
 
-			return this._fonts[key] = new CTFont(fontName, (float)fontSize);
+			return _fonts[key] = new CTFont(fontName, (float)fontSize);
 		}
 
 		/// <summary>
@@ -572,7 +559,7 @@ namespace OxyPlot.Xamarin.iOS {
 		private void SetAlias(
 			bool alias
 		) {
-			this._gCtx.SetShouldAntialias(!alias);
+			_gCtx.SetShouldAntialias(!alias);
 		}
 
 		/// <summary>
@@ -583,7 +570,7 @@ namespace OxyPlot.Xamarin.iOS {
 			OxyColor c
 		) {
 			CGColor color = c.ToCGColor();
-			this._gCtx.SetFillColor(color);
+			_gCtx.SetFillColor(color);
 			return color;
 		}
 
@@ -601,14 +588,14 @@ namespace OxyPlot.Xamarin.iOS {
 			LineJoin lineJoin = LineJoin.Miter
 		) {
 			CGColor color = c.ToCGColor();
-			this._gCtx.SetStrokeColor(color);
-			this._gCtx.SetLineWidth((float)thickness);
-			this._gCtx.SetLineJoin(lineJoin.Convert());
+			_gCtx.SetStrokeColor(color);
+			_gCtx.SetLineWidth((float)thickness);
+			_gCtx.SetLineJoin(lineJoin.Convert());
 			if (dashArray != null) {
 				nfloat[] lengths = dashArray.Select(d => (nfloat)d).ToArray();
-				this._gCtx.SetLineDash(0f, lengths);
+				_gCtx.SetLineDash(0f, lengths);
 			} else {
-				this._gCtx.SetLineDash(0, null);
+				_gCtx.SetLineDash(0, null);
 			}
 
 			return color;
@@ -626,17 +613,17 @@ namespace OxyPlot.Xamarin.iOS {
 				return null;
 			}
 
-			if (!this._imagesInUse.Contains(source)) {
-				this._imagesInUse.Add(source);
+			if (!_imagesInUse.Contains(source)) {
+				_imagesInUse.Add(source);
 			}
 
-			if (this._imageCache.TryGetValue(source, out UIImage? src)) return src;
+			if (_imageCache.TryGetValue(source, out UIImage? src)) return src;
 
 			using (NSData data = NSData.FromArray(source.GetData())) {
 				src = UIImage.LoadFromData(data);
 			}
 
-			this._imageCache.Add(source, src);
+			_imageCache.Add(source, src);
 
 			return src;
 		}

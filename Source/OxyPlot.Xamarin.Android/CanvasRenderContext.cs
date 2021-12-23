@@ -271,8 +271,7 @@ namespace OxyPlot.Xamarin.Android {
 
 				float width;
 				float height;
-				float lineHeight, delta;
-				GetFontMetrics(_paint, out lineHeight, out delta);
+				GetFontMetrics(_paint, out float lineHeight, out float delta);
 				if (maxSize.HasValue || halign != HorizontalAlignment.Left || valign != VerticalAlignment.Bottom) {
 					_paint.GetTextBounds(text, 0, text.Length, _bounds);
 					width = _bounds.Left + _bounds.Width();
@@ -333,8 +332,7 @@ namespace OxyPlot.Xamarin.Android {
 			{
 				_paint.AntiAlias = true;
 				_paint.TextSize = Convert(fontSize);
-				float lineHeight;
-				GetFontMetrics(_paint, out lineHeight, out float _);
+				GetFontMetrics(_paint, out float lineHeight, out float _);
 				_paint.GetTextBounds(text, 0, text.Length, _bounds);
 				return new OxySize(_bounds.Width() / FontScale, lineHeight / FontScale);
 			}
@@ -528,8 +526,7 @@ namespace OxyPlot.Xamarin.Android {
 				_imagesInUse.Add(source);
 			}
 
-			Bitmap? bitmap;
-			if (!_imageCache.TryGetValue(source, out bitmap)) {
+			if (!_imageCache.TryGetValue(source, out Bitmap? bitmap)) {
 				byte[] bytes = source.GetData();
 				bitmap = BitmapFactory.DecodeByteArray(bytes, 0, bytes.Length);
 				if (bitmap != null) {
